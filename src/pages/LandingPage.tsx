@@ -161,6 +161,24 @@ export const LandingPage: React.FC = () => {
       icon: '🌀', gradient: 'linear-gradient(135deg, #0891b2, #7c3aed)',
       ready: true, isNew: true,
     },
+    {
+      id: 'particle-life', title: 'Particle Life', path: '/particle-life',
+      desc: '6종 1만 파티클의 종별 인력/반발. 카오스/하모니/포식자/대칭 프리셋.',
+      icon: '🧬', gradient: 'linear-gradient(135deg, #f43f5e, #f97316)',
+      ready: true, isNew: true,
+    },
+    {
+      id: 'voronoi', title: 'Voronoi Diagram', path: '/voronoi',
+      desc: '32개 시드가 튕기며 만드는 Voronoi 셀. Cell/Distance/Smooth 색상 모드.',
+      icon: '🔵', gradient: 'linear-gradient(135deg, #06b6d4, #6366f1)',
+      ready: true, isNew: true,
+    },
+    {
+      id: 'physarum', title: 'Physarum Slime Mold', path: '/physarum',
+      desc: '20만 에이전트가 만드는 점균류 네트워크. 감지·확산·잔류로 유기적 튜브 패턴 생성.',
+      icon: '🍄', gradient: 'linear-gradient(135deg, #4ade80, #16a34a)',
+      ready: true, isNew: true,
+    },
   ];
 
   return (
@@ -180,7 +198,7 @@ export const LandingPage: React.FC = () => {
           <div className="hero-features">
             <span className="hero-chip">500K+ Particles</span>
             <span className="hero-chip">Real-time GPU Compute</span>
-            <span className="hero-chip">13 Simulations</span>
+            <span className="hero-chip">16 Simulations</span>
           </div>
 
           <div className={`gpu-status-bar status-${gpuStatus}`}>

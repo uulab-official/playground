@@ -20,6 +20,9 @@ const WaveEquationPage     = lazy(() => import('./pages/WaveEquationPage').then(
 const FluidSimPage         = lazy(() => import('./pages/FluidSimPage').then(m => ({ default: m.FluidSimPage })));
 const MandelbulbPage       = lazy(() => import('./pages/MandelbulbPage').then(m => ({ default: m.MandelbulbPage })));
 const AttractorPage        = lazy(() => import('./pages/AttractorPage').then(m => ({ default: m.AttractorPage })));
+const ParticleLifePage     = lazy(() => import('./pages/ParticleLifePage').then(m => ({ default: m.ParticleLifePage })));
+const VoronoiPage          = lazy(() => import('./pages/VoronoiPage').then(m => ({ default: m.VoronoiPage })));
+const PhysarumPage         = lazy(() => import('./pages/PhysarumPage').then(m => ({ default: m.PhysarumPage })));
 const LeaderboardPage      = lazy(() => import('./pages/LeaderboardPage').then(m => ({ default: m.LeaderboardPage })));
 const NotFoundPage         = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 
@@ -43,8 +46,11 @@ function App() {
           <Route path="/wave"       element={<WaveEquationPage />} />
           <Route path="/fluid"      element={<FluidSimPage />} />
           <Route path="/mandelbulb" element={<MandelbulbPage />} />
-          <Route path="/attractor"  element={<AttractorPage />} />
-          <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/attractor"      element={<AttractorPage />} />
+          <Route path="/particle-life" element={<ParticleLifePage />} />
+          <Route path="/voronoi"        element={<VoronoiPage />} />
+          <Route path="/physarum"       element={<PhysarumPage />} />
+          <Route path="/leaderboard"   element={<LeaderboardPage />} />
           <Route path="*"           element={<NotFoundPage />} />
         </Routes>
       </Suspense>
