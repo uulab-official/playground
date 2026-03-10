@@ -1,47 +1,124 @@
 struct VertexOutput {
   @builtin(position) position: vec4<f32>,
   @location(0) color: vec4<f32>,
+  @location(1) uv: vec2<f32>,
 };
 
-// Information passed per instance (particle)
 struct ParticleInstance {
   @location(0) pos: vec2<f32>,
   @location(1) vel: vec2<f32>,
-  // Add other properties later like color/type
 };
+
+struct RenderParams {
+  aspectRatio: f32,
+  particleScale: f32,
+  materialType: f32,  // 0=normal, 1=fire, 2=water, 3=spark
+  padding: f32,
+};
+
+@group(0) @binding(0) var<uniform> params: RenderParams;
+
+// Color palettes per material
+fn getColor(speed: f32, material: f32) -> vec3<f32> {
+  let t = clamp(speed * 1.5, 0.0, 1.0);
+  let mat = u32(material);
+
+  // Fire: dark red -> orange -> yellow -> white
+  if (mat == 1u) {
+    if (t < 0.33) {
+      let s = t / 0.33;
+      return mix(vec3<f32>(0.3, 0.05, 0.0), vec3<f32>(0.9, 0.2, 0.0), s);
+    } else if (t < 0.66) {
+      let s = (t - 0.33) / 0.33;
+      return mix(vec3<f32>(0.9, 0.2, 0.0), vec3<f32>(1.0, 0.8, 0.1), s);
+    } else {
+      let s = (t - 0.66) / 0.34;
+      return mix(vec3<f32>(1.0, 0.8, 0.1), vec3<f32>(1.0, 1.0, 0.9), s);
+    }
+  }
+
+  // Water: deep blue -> cyan -> white
+  if (mat == 2u) {
+    if (t < 0.5) {
+      let s = t / 0.5;
+      return mix(vec3<f32>(0.0, 0.1, 0.5), vec3<f32>(0.1, 0.6, 0.9), s);
+    } else {
+      let s = (t - 0.5) / 0.5;
+      return mix(vec3<f32>(0.1, 0.6, 0.9), vec3<f32>(0.8, 0.95, 1.0), s);
+    }
+  }
+
+  // Spark: gold -> bright yellow -> white
+  if (mat == 3u) {
+    if (t < 0.5) {
+      let s = t / 0.5;
+      return mix(vec3<f32>(0.6, 0.3, 0.0), vec3<f32>(1.0, 0.85, 0.2), s);
+    } else {
+      let s = (t - 0.5) / 0.5;
+      return mix(vec3<f32>(1.0, 0.85, 0.2), vec3<f32>(1.0, 1.0, 1.0), s);
+    }
+  }
+
+  // Normal: blue -> cyan -> green -> orange -> white
+  if (t < 0.25) {
+    let s = t / 0.25;
+    return mix(vec3<f32>(0.1, 0.2, 0.8), vec3<f32>(0.1, 0.7, 1.0), s);
+  } else if (t < 0.5) {
+    let s = (t - 0.25) / 0.25;
+    return mix(vec3<f32>(0.1, 0.7, 1.0), vec3<f32>(0.3, 1.0, 0.5), s);
+  } else if (t < 0.75) {
+    let s = (t - 0.5) / 0.25;
+    return mix(vec3<f32>(0.3, 1.0, 0.5), vec3<f32>(1.0, 0.7, 0.1), s);
+  } else {
+    let s = (t - 0.75) / 0.25;
+    return mix(vec3<f32>(1.0, 0.7, 0.1), vec3<f32>(1.0, 1.0, 1.0), s);
+  }
+}
 
 @vertex
 fn vs_main(
-  @builtin(vertex_index) VertexIndex : u32,
+  @builtin(vertex_index) vid: u32,
   instance: ParticleInstance
 ) -> VertexOutput {
-  var pos = array<vec2<f32>, 4>(
+  var corners = array<vec2<f32>, 4>(
     vec2<f32>(-1.0, -1.0),
     vec2<f32>( 1.0, -1.0),
     vec2<f32>(-1.0,  1.0),
     vec2<f32>( 1.0,  1.0)
   );
 
-  var output : VertexOutput;
-  // Size of the particle. Later this can be uniform or per-particle.
-  let particleSize = 4.0; 
-  // Map canvas coordinate (0 to width) to NDC (-1 to 1) 
-  // We will pass aspect or resolution uniform later, but for MVP keep it simple 
-  // Assumes canvas coords passed in instances are already normalized NDC or we apply matrix
-  // For now, let's assume `instance.pos` is in NDC (-1 to 1)
+  var output: VertexOutput;
 
-  output.position = vec4<f32>(instance.pos + pos[VertexIndex] * 0.005, 0.0, 1.0);
-  
-  // Base color logic (can be based on velocity scalar)
   let speed = length(instance.vel);
-  let r = clamp(speed * 0.1, 0.2, 1.0);
-  
-  output.color = vec4<f32>(r, 0.5, 1.0 - r, 1.0);
-  
+  let baseSize = params.particleScale;
+  let sizeBoost = clamp(speed * 0.3, 0.0, 2.0);
+  let size = baseSize * (1.0 + sizeBoost);
+
+  var offset = corners[vid] * size;
+  offset.x /= params.aspectRatio;
+
+  output.position = vec4<f32>(instance.pos + offset, 0.0, 1.0);
+  output.uv = corners[vid];
+
+  let col = getColor(speed, params.materialType);
+  output.color = vec4<f32>(col, 1.0);
+
   return output;
 }
 
 @fragment
-fn fs_main(@location(0) color: vec4<f32>) -> @location(0) vec4<f32> {
-  return color;
+fn fs_main(
+  @location(0) color: vec4<f32>,
+  @location(1) uv: vec2<f32>,
+) -> @location(0) vec4<f32> {
+  let dist = length(uv);
+  if (dist > 1.0) {
+    discard;
+  }
+
+  let alpha = 1.0 - smoothstep(0.0, 1.0, dist);
+  let glow = exp(-dist * dist * 3.0);
+  let finalAlpha = alpha * 0.6 + glow * 0.4;
+
+  return vec4<f32>(color.rgb * finalAlpha, finalAlpha);
 }
