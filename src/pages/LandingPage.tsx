@@ -179,6 +179,24 @@ export const LandingPage: React.FC = () => {
       icon: '🍄', gradient: 'linear-gradient(135deg, #4ade80, #16a34a)',
       ready: true, isNew: true,
     },
+    {
+      id: 'fire', title: 'Fire Simulation', path: '/fire',
+      desc: '셀룰러 오토마타 기반 화재 시뮬레이션. 냉각·난류 조절, Fire/Plasma/Ice 색상 모드.',
+      icon: '🔥', gradient: 'linear-gradient(135deg, #ef4444, #f97316)',
+      ready: true, isNew: true,
+    },
+    {
+      id: 'nbody', title: 'N-Body Gravity', path: '/nbody',
+      desc: '4096개 천체의 O(N²) 전체쌍 중력 계산. 타일 공유메모리 최적화, Galaxy/Binary/Ring 프리셋.',
+      icon: '🌌', gradient: 'linear-gradient(135deg, #1e1b4b, #4f46e5)',
+      ready: true, isNew: true,
+    },
+    {
+      id: 'lenia', title: 'Lenia', path: '/lenia',
+      desc: '연속 셀룰러 오토마타 — 링 커널 컨볼루션으로 생명체 같은 패턴. Orbium, Gyro 등 4종.',
+      icon: '🧫', gradient: 'linear-gradient(135deg, #065f46, #34d399)',
+      ready: true, isNew: true,
+    },
   ];
 
   return (
@@ -198,7 +216,7 @@ export const LandingPage: React.FC = () => {
           <div className="hero-features">
             <span className="hero-chip">500K+ Particles</span>
             <span className="hero-chip">Real-time GPU Compute</span>
-            <span className="hero-chip">16 Simulations</span>
+            <span className="hero-chip">19 Simulations</span>
           </div>
 
           <div className={`gpu-status-bar status-${gpuStatus}`}>
