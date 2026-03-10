@@ -23,6 +23,9 @@ const AttractorPage        = lazy(() => import('./pages/AttractorPage').then(m =
 const ParticleLifePage     = lazy(() => import('./pages/ParticleLifePage').then(m => ({ default: m.ParticleLifePage })));
 const VoronoiPage          = lazy(() => import('./pages/VoronoiPage').then(m => ({ default: m.VoronoiPage })));
 const PhysarumPage         = lazy(() => import('./pages/PhysarumPage').then(m => ({ default: m.PhysarumPage })));
+const FirePage             = lazy(() => import('./pages/FirePage').then(m => ({ default: m.FirePage })));
+const NBodyPage            = lazy(() => import('./pages/NBodyPage').then(m => ({ default: m.NBodyPage })));
+const LeniaPage            = lazy(() => import('./pages/LeniaPage').then(m => ({ default: m.LeniaPage })));
 const LeaderboardPage      = lazy(() => import('./pages/LeaderboardPage').then(m => ({ default: m.LeaderboardPage })));
 const NotFoundPage         = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 
@@ -50,6 +53,9 @@ function App() {
           <Route path="/particle-life" element={<ParticleLifePage />} />
           <Route path="/voronoi"        element={<VoronoiPage />} />
           <Route path="/physarum"       element={<PhysarumPage />} />
+          <Route path="/fire"           element={<FirePage />} />
+          <Route path="/nbody"          element={<NBodyPage />} />
+          <Route path="/lenia"          element={<LeniaPage />} />
           <Route path="/leaderboard"   element={<LeaderboardPage />} />
           <Route path="*"           element={<NotFoundPage />} />
         </Routes>
