@@ -20,6 +20,19 @@
     <meta name="twitter:title" content="GPU Playground" />
     <meta name="twitter:description" content="WebGPU 기반 GPU 벤치마크 & 시뮬레이션 플랫폼" />
     <meta name="twitter:image" content="https://playground.uulab.co.kr/og-image.png" />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- Google Analytics (replace G-XXXXXXXXXX with your Measurement ID) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
   </head>
   <body>
     <div id="root"></div>

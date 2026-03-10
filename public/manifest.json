@@ -1,0 +1,27 @@
+{
+  "name": "GPU Playground",
+  "short_name": "GPU Play",
+  "description": "WebGPU 기반 초고성능 시뮬레이션 & 벤치마크 플랫폼",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08090c",
+  "theme_color": "#6366f1",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "label": "GPU Playground Home"
+    }
+  ],
+  "categories": ["games", "entertainment", "utilities"]
+}
