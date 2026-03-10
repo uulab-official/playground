@@ -1,25 +1,41 @@
-# Browser GPU Particle Simulator & Stress Test
+# GPU Playground (Particle Lab)
 
-## Overview
-A web-based GPU stress test and physics sandbox built with WebGPU. This project combines the fun, emergent gameplay of "falling sand" simulators with the intense, scalable performance benchmarking of modern GPU stress tests. 
+A web-based GPU physics simulation playground and performance benchmarking tool built with WebGPU.
 
-## Features
-- **Particle Drop**: Gravity, bounce, friction simulations with up to 200k particles.
-- **Falling Sand**: Elemental interactions between materials like water, fire, smoke, and acid.
-- **Fluid Playground**: Compute shader-driven fluid dynamics.
-- **Stress Test**: Benchmark your device's GPU performance with a customizable automated particle load.
+## Core Features
+1. **Playground Modes**: 
+   - **Particle Drop**: Render 10k-200k particles with gravity and collisions.
+   - **Sandbox**: Elemental interactions (Sand, Water, Fire, Lava).
+   - **Fluid & Chaos**: Advanced compute shader fluid dynamics and extreme stress testing.
+2. **Benchmark Mode**: Test your device's capabilities (GPU, FPS, Frame Time) and generate shareable scorecards.
+3. **Viral Tools**: 10-second clip recordings and extreme visual presets (Blackhole, Volcano).
 
 ## Tech Stack
-- Frontend: `Vite`, `React`, `TypeScript`
-- Rendering/Compute: `WebGPU`, `WGSL`, `WebGL2` fallback
-- State Management: `Zustand`
-- Data Visualization: `lightweight-charts`
-- Deployment: `Cloudflare Pages` / `GitHub Pages`
+- Frontend: Vite + React + TypeScript + Zustand
+- GPU Compute & Render: WebGPU + WGSL
+- Charts: lightweight-charts
+- Deployment: Fully static, frontend-only deployment ready for Cloudflare Pages / GitHub Pages.
 
-## Development
-See the `develop` branch for actual source code and implementation.
+## Project Structure
+```text
+playground/
+├── docs/                # Project architecture and IA definitions
+├── public/              # Static assets
+└── src/
+    ├── components/      # React UI Components (e.g. WebGPUCanvas)
+    ├── lib/             # WebGPU context utilities and helpers
+    ├── shaders/         # WGSL compute and render shaders
+    ├── stores/          # Zustand global state management
+    ├── App.tsx          # Main application overlay and routing
+    └── index.css        # Premium dark/light themes
+```
+
+## Running Locally
+
+To run the application locally on the `develop` branch:
 
 ```bash
+git checkout develop
 npm install
 npm run dev
 ```

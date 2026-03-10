@@ -1,106 +1,98 @@
-# 실서비스용 IA 및 기획 정의서 (Information Architecture & Specification)
+# GPU Playground (가칭: Particle Lab) - 기획 및 아키텍처 정의서
 
-## 1. 메뉴 구조 (Menu Structure)
-- **Home (Landing Page)**
-  - 서비스 소개 및 메인 CTA (모드 선택으로 이동)
-  - 최근 이슈/공지사항
-- **플레이 모드 (Play Modes)**
-  - Particle Drop (파티클 드롭)
-  - Falling Sand (샌드박스)
-  - Fluid Playground (유체 시뮬레이션)
-- **성능 테스트 (Stress Test)**
-  - 벤치마크 시작 (저/중/고/익스트림 프리셋)
-  - 벤치마크 결과 리포트 (점수 및 기기 비교)
-- **갤러리 & 커뮤니티 (추후 확장 가능성 대비)**
-  - 공유된 시뮬레이션 환경 (시드/설정)
-- **설정 및 안내 (Settings & Info)**
-  - 브라우저 WebGPU 지원 여부 및 가이드
-  - 설정 (다크모드, 디버그 오버레이, 해상도 조절 등)
+## 1. 서비스 개요
+- **목표**: 서버 없이 정적 웹으로 운영되는 WebGPU 기반 물리 시뮬레이션 놀이터 겸 PC 성능 테스트 기능
+- **방향성**: "Sandboxels의 재미 + WebGPU 파티클 데모의 기술력 + Basemark류의 점수 UX" 결합 (Playground + Benchmark)
+- **수익 모델**: Google Adsense (상단, 측면, 결과 화면) 배너 광고
+- **유입 전략**: 극단적 벤치마크 점수와 바이럴 요소를 통한 유튜브 쇼츠, 틱톡, 레딧, 트위터 공유
 
-## 2. 화면별 기능 (Features per Screen)
+## 2. 전체 서비스 구조 (IA)
 
-### A. 랜딩 페이지
-- WebGPU 지원 여부 자동 감지 바 표시 (지원/미지원/WebGL 폴백 안내)
-- 모드별 대표 썸네일/짧은 영상 플레이
-- "지금 바로 시작" 메인 버튼
-
-### B. 샌드박스 플레이 화면 (Particle, Sand, Fluid)
-- **캔버스 영역**: 반응형 자동 해상도 캔버스, 사용자와 마우스 상호작용 (클릭 시 입자 생성, 드래그 시 밀기/반응).
-- **좌측 툴바**: 재료 선택 (모래, 물, 불 등), 브러시 크기, 장애물 도구.
-- **우측 패널**: 시뮬레이션 제어 (일시정지, 슬로모션, 배속), 입자 수 수동 조절 슬라이더, 현재 입자 수/FPS 실시간 표시.
-- **하단 액션 메뉴**: 화면 지우기, 스크린샷 캡처, 시드값 복사(상태 공유용), 설정 저장.
-
-### C. 벤치마크 진행 화면
-- **시야 최소화된 UI**: 온전히 시뮬레이션 자체에 리소스를 집중하기 위해 UI를 숨김.
-- **실시간 HUD**: 진행 시간(예: 30초/60초), 현재 입자 수, 실시간 FPS 및 Frame Time 그래프 (lightweight-charts 사용).
-- **자동 부하 로직**: 정해진 스크립트에 따라 단계별로 입자를 투입하거나 장애물을 생성.
-
-### D. 결과 리포트 화면
-- **성능 서머리**: 기기 정보 (GPU 이름, 브라우저), 종합 점수, 평균/최소 FPS, 유지된 최대 입자 수.
-- **결과 카드 생성 기능**: 소셜 미디어(유튜브 썸네일 등) 공유용 이미지 다운로드 버튼.
-
-## 3. 데이터 구조 (Data Structure - Zustand Store)
-
-```typescript
-// 시뮬레이션 글로벌 상태
-interface SimulationState {
-  currentMode: 'PARTICLE' | 'SAND' | 'FLUID' | 'BENCHMARK';
-  particleCount: number;
-  fps: number;
-  frameTimes: number[];
-  isPaused: boolean;
-  timeScale: number; // 0.5, 1.0, 2.0 등
-  settings: {
-    darkMode: boolean;
-    useWebGPU: boolean;
-    resolutionScale: number; // 0.5 ~ 1.0 (성능 타협용)
-  };
-}
-
-// 벤치마크 결과 데이터
-interface BenchmarkResult {
-  userId: string; // 익명 세션 ID
-  gpuModel: string;
-  browserVersion: string;
-  totalScore: number;
-  avgFps: number;
-  percentile1LowFps: number;
-  maxParticlesMaintained: number;
-  durationSeconds: number;
-  timestamp: Date;
-}
+```text
+Home (Landing)
+ ├ Playground (놀이터 모드)
+ │   ├ Particle Drop (기본 1만~20만 입자 중력/충돌)
+ │   ├ Sand Simulation (모래, 물, 불 등 재질 상호작용)
+ │   ├ Fluid Simulation (유체 역학, 압력 분사)
+ │   └ Chaos Mode (극단적 환경 설정, 예: 블랙홀+폭발 연쇄)
+ │
+ ├ Benchmark (PC 성능 테스트 모드)
+ │   ├ Quick Test (입자 50K, 30초 지속)
+ │   ├ Extreme Test (입자 200K, 60초 지속)
+ │   └ Ultimate Test (점진적 입자 자동 증가, 120초 지속)
+ │
+ ├ Gallery (추후 MVP 확장 가능)
+ │   ├ Popular Simulations
+ │   └ Community Creations
+ │
+ ├ Learn
+ │   ├ How GPU Physics Works
+ │   └ WebGPU Info
+ │
+ └ Settings
+     ├ Graphics (Ultra, High, Medium, Low)
+     └ Performance (Auto Scaling)
 ```
 
-## 4. 점수 계산식 (Score Calculation Formula)
+## 3. 핵심 게임 / 시뮬레이션 모드 상세
 
-벤치마크의 종합 점수는 기기의 GPU 처리 능력과 렌더링 유지력을 균형 있게 반영해야 합니다.
+### 3.1. Particle Drop (기본 모드)
+- 입자 수: 1만 ~ 20만 개
+- 물리 효과: 중력, 개별 충돌, 바닥 반사, 장애물
+- 인터랙션: 마우스 드래그를 통한 밀기, 폭발, 블랙홀 생성
+- 주요 프리셋: 10K / 50K / 100K / 200K balls
 
-* **최종 점수 (Total Score) = (안정화된 평균 FPS) × (유지 입자 수 계수) × (안정성 가중치)**
+### 3.2. Falling Sand (샌드박스)
+- 재료 목록: sand, water, smoke, fire, lava, oil, stone, plant, metal
+- 화학 반응 예시:
+  - 불 + 기름 → 폭발 (Explosion)
+  - 물 + 용암 → 돌 (Stone)
+  - 불 + 식물 → 연기 (Smoke)
+- 유튜브/쇼츠에서 가장 바이럴이 쉽게 일어나는 코어 콘텐츠입니다.
 
-**세부 산식 예시:**
-1. **성능 점수 (Base Performance) =** `(Avg FPS) * (Max Particles / 1000)`
-2. **안정성 가중치 (Stability Weight) =** `1 - ((Avg FPS - 1% Low FPS) / Avg FPS)` 
-   *(드랍이 클수록 점수가 깎임. 최소 0.5 최대 1.0)*
-3. **최종 식 =** `Base Performance * Stability Weight`
-   *(ex: 평균 60fps, 10만 개 유지, 1% Low가 45fps(안정성 0.75) => 60 * 100 * 0.75 = 4500점)*
+### 3.3. Fluid Simulation
+- 유체 전용 동역학 (Compute Shader 기반)
+- 사용자 조작: Water Cannon(물 분사), Drain(배수구), Gravity Change.
 
-## 5. MVP 일정 (Development Schedule - MVP 1단계)
+### 3.4. Chaos Mode
+- 스트레스 테스트 전용 Playground.
+- 50만 입자, 중력 반전, 입자 폭풍(Particle Storm), 연쇄 폭발 등 극단 환경.
 
-* **1주차: 프로젝트 세팅 및 코어 렌더링 엔진 구축**
-  - Vite + React + TypeScript 환경 구성
-  - WebGPU 캔버스 초기화 및 WebGL 폴백 확인
-  - Compute Shader 기초 작성 (2D 이동, 중력, 벽 충돌)
-* **2주차: 기본 파티클 기능 구현 (Particle Drop 모드)**
-  - 10만 개 단위 입자 렌더링 최적화
-  - 마우스 상호작용 (입자 생성, 브러시 기능)
-  - 기본 UI (상단 FPS/카운트 표시, 일시정지 버튼)
-* **3주차: 상태 관리 및 샌드박스 기초 (UI/UX)**
-  - Zustand 스토어 연결
-  - 모드 선택 페이지 및 라우팅 (Home -> Sandbox)
-  - 3가지 프리셋(폭발, 와류 등) 추가
-* **4주차: 최적화 및 결과 검증, 배포**
-  - 기기별 호환성 테스트
-  - Cloudflare Pages 연동 및 정적 배포
-  - 공유 가능한 초기 버전 릴리즈 (MVP 1 완성)
+## 4. Benchmark (성능 테스트) 상세
 
-MVP 이후 `sandboxels` 수준의 다양한 재질(물, 불) 도입 및 벤치마크 모드 본격화를 순차적으로 진행합니다.
+벤치마크는 점수 및 수치화를 통한 PC 성능 비교 툴로 작용합니다.
+
+- **출력 정보**: GPU Name, Browser, 해상도, 입자 수, Average FPS, Minimum FPS (1% Low), Frame Time
+- **점수 산출/공유**:
+  ```text
+  [결과 예시]
+  Device : RTX 4070
+  Browser : Chrome
+  Particles : 200000 
+  Average FPS : 82 
+  Minimum FPS : 44
+  Score : 12500 (Rank: A+)
+  ```
+- **공유 액션**: 결과 이미지 생성(Share Image), 링크 복사, 다운로드.
+
+## 5. 바이럴 요소
+1. **극단적 테스트**: "내 노트북은 100만 파티클 버틸까?" 자극.
+2. **마우스 인터랙션**: 드래그 시 입자 폭풍 발생 등 시각적 쾌감.
+3. **프리셋**: Black Hole, Sand Volcano, Water Tornado 등의 원클릭 시연.
+4. **녹화 기능**: 10초 클립 Export 기능을 통한 쇼츠/릴스 생성 유도.
+
+## 6. 기술 스택 및 렌더링 아키텍처
+- **도메인/배포**: Cloudflare Pages / GitHub Pages 등 정적 서버 구조 (100% 클라이언트 연산)
+- **상태 관리/프론트엔드**: React, TypeScript, Vite, Zustand
+- **렌더링 파이프라인**: 
+  - `Browser(React UI) -> Input -> WebGPU Compute Shader(Physics) -> WebGPU Render Shader`
+- **폴백(Fallback)**: WebGPU 미지원 기기를 위한 WebGL2 지원(제한된 파티클).
+
+### WebGPU 데이터 파이프라인 개념
+입자(Particle) 정보는 매 프레임 CPU를 거치지 않고 오직 GPU 내부 `Storage Buffer`에서만 핑퐁(Ping-Pong)되며 위치(Position)와 속도(Velocity)가 연산됩니다. UI 오버레이만이 React와 Zustand 상태를 읽어 화면에 FPS 차트(`lightweight-charts`)를 그립니다.
+
+## 7. 개발 마일스톤 (MVP 일정)
+* **1단계 (1주차) [완료]**: 코어 엔진 구축, MVP WebGPU 환경, UI 구조 세팅, Particle Drop 기본 렌더링.
+* **2단계 (2주차)**: Sandbox 모드 (Sand, Water, Fire 등 재질 상호작용 및 브러시 도구).
+* **3단계 (3주차)**: Benchmark 모드 로직 (FPS 기반 점수 측정 및 결과 리포트 화면 UI).
+* **4단계 (4주차)**: 바이럴 기능 (스크린샷, 짧은 GIF/WEBM 녹화, 프리셋 시스템).
