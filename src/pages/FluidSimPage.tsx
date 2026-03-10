@@ -176,11 +176,13 @@ export const FluidSimPage: React.FC = () => {
     const pressurePipeline = makeComputePipeline('pressureSolve');
     const gradientPipeline = makeComputePipeline('subtractGradient');
 
-    // Render bind group layout
+    // Render bind group layout — all 4 bindings declared in fluid_render.wgsl
     const renderBGL = device.createBindGroupLayout({
       entries: [
         { binding: 0, visibility: GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' } },
         { binding: 1, visibility: GPUShaderStage.FRAGMENT, buffer: { type: 'read-only-storage' } },
+        { binding: 2, visibility: GPUShaderStage.FRAGMENT, buffer: { type: 'read-only-storage' } },
+        { binding: 3, visibility: GPUShaderStage.FRAGMENT, buffer: { type: 'read-only-storage' } },
       ],
     });
     const renderBindGroups = [0, 1].map(i => device.createBindGroup({
@@ -188,6 +190,8 @@ export const FluidSimPage: React.FC = () => {
       entries: [
         { binding: 0, resource: { buffer: renderUniformBuffer } },
         { binding: 1, resource: { buffer: dyeBuffers[i] } },
+        { binding: 2, resource: { buffer: velocityBuffers[i] } },
+        { binding: 3, resource: { buffer: pressureBuffers[i] } },
       ],
     }));
     const renderPipeline = device.createRenderPipeline({
@@ -262,7 +266,7 @@ export const FluidSimPage: React.FC = () => {
     cu[5] = m.y;                   // mouseY
     cu[6] = m.dx;                  // mouseDX
     cu[7] = m.dy;                  // mouseDY
-    cu[8] = m.active ? 1.0 : 0.0; // mouseActive
+    cuU32[8] = m.active ? 1 : 0;   // mouseActive (u32)
     cu[9] = dyeR;                  // dyeR
     cu[10] = dyeG;                 // dyeG
     cu[11] = dyeB;                 // dyeB
@@ -290,16 +294,19 @@ export const FluidSimPage: React.FC = () => {
       // bind group 0: vel[0]->vel[1], pres[0]->pres[1], dye[0]->dye[1]
       // bind group 1: vel[1]->vel[0], pres[1]->pres[0], dye[1]->dye[0]
 
-      // 1. Add forces - writes to velocity[write] and dye[write] via current bind group
+      // 1. Add forces - reads vel[velIdx]/dye[dyeIdx], writes to [1-velIdx]/[1-dyeIdx]
+      //    Swap both indices so next passes read the force-applied buffers
       {
         const pass = encoder.beginComputePass();
         pass.setPipeline(gpu.addForcesPipeline);
         pass.setBindGroup(0, gpu.computeBindGroups[gpu.velIdx]);
         pass.dispatchWorkgroups(wgX, wgY);
         pass.end();
+        gpu.velIdx = 1 - gpu.velIdx;
+        gpu.dyeIdx = 1 - gpu.dyeIdx;
       }
 
-      // 2. Advect velocity - reads vel[read], writes vel[write], then swap
+      // 2. Advect velocity - reads force-applied vel[velIdx], writes vel[1-velIdx], then swap
       {
         const pass = encoder.beginComputePass();
         pass.setPipeline(gpu.advectVelocityPipeline);
