@@ -18,6 +18,8 @@ const AudioVisualizerPage  = lazy(() => import('./pages/AudioVisualizerPage').th
 const GalaxyPage           = lazy(() => import('./pages/GalaxyPage').then(m => ({ default: m.GalaxyPage })));
 const WaveEquationPage     = lazy(() => import('./pages/WaveEquationPage').then(m => ({ default: m.WaveEquationPage })));
 const FluidSimPage         = lazy(() => import('./pages/FluidSimPage').then(m => ({ default: m.FluidSimPage })));
+const MandelbulbPage       = lazy(() => import('./pages/MandelbulbPage').then(m => ({ default: m.MandelbulbPage })));
+const AttractorPage        = lazy(() => import('./pages/AttractorPage').then(m => ({ default: m.AttractorPage })));
 const LeaderboardPage      = lazy(() => import('./pages/LeaderboardPage').then(m => ({ default: m.LeaderboardPage })));
 const NotFoundPage         = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 
@@ -40,6 +42,8 @@ function App() {
           <Route path="/galaxy"     element={<GalaxyPage />} />
           <Route path="/wave"       element={<WaveEquationPage />} />
           <Route path="/fluid"      element={<FluidSimPage />} />
+          <Route path="/mandelbulb" element={<MandelbulbPage />} />
+          <Route path="/attractor"  element={<AttractorPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="*"           element={<NotFoundPage />} />
         </Routes>
