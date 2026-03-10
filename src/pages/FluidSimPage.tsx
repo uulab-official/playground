@@ -400,7 +400,7 @@ export const FluidSimPage: React.FC = () => {
       const rect = canvas.getBoundingClientRect();
       return {
         x: (clientX - rect.left) / rect.width,
-        y: 1 - (clientY - rect.top) / rect.height,
+        y: (clientY - rect.top) / rect.height,
       };
     };
 
