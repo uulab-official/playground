@@ -149,6 +149,18 @@ export const LandingPage: React.FC = () => {
       icon: '🌊', gradient: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
       ready: true, isNew: true,
     },
+    {
+      id: 'mandelbulb', title: 'Mandelbulb 3D', path: '/mandelbulb',
+      desc: '레이마칭으로 실시간 렌더링하는 3D 프랙탈. 드래그로 회전, 스크롤로 줌. Power 조절로 완전히 다른 형태.',
+      icon: '🔷', gradient: 'linear-gradient(135deg, #7c3aed, #db2777)',
+      ready: true, isNew: true,
+    },
+    {
+      id: 'attractor', title: 'Strange Attractors', path: '/attractor',
+      desc: '30만 파티클로 카오스 역학계를 실시간 추적. 로렌즈/토마스/할보르센/아이자와.',
+      icon: '🌀', gradient: 'linear-gradient(135deg, #0891b2, #7c3aed)',
+      ready: true, isNew: true,
+    },
   ];
 
   return (
@@ -168,7 +180,7 @@ export const LandingPage: React.FC = () => {
           <div className="hero-features">
             <span className="hero-chip">500K+ Particles</span>
             <span className="hero-chip">Real-time GPU Compute</span>
-            <span className="hero-chip">11 Simulations</span>
+            <span className="hero-chip">13 Simulations</span>
           </div>
 
           <div className={`gpu-status-bar status-${gpuStatus}`}>

@@ -288,6 +288,19 @@ fn pressureSolve(@builtin(global_invocation_id) gid: vec3<u32>) {
 // Makes velocity field divergence-free
 // ---------------------------------------------------------------------------
 
+// Compute vorticity (curl) at grid cell from velocityIn
+fn cellCurl(cx: u32, cy: u32) -> f32 {
+  let xL = clampX(i32(cx) - 1);
+  let xR = clampX(i32(cx) + 1);
+  let yB = clampY(i32(cy) - 1);
+  let yT = clampY(i32(cy) + 1);
+  let vL = readVelocity(xL, cy);
+  let vR = readVelocity(xR, cy);
+  let vB = readVelocity(cx, yB);
+  let vT = readVelocity(cx, yT);
+  return (vR.y - vL.y) - (vT.x - vB.x);
+}
+
 @compute @workgroup_size(16, 16)
 fn subtractGradient(@builtin(global_invocation_id) gid: vec3<u32>) {
   let x = gid.x;
@@ -306,9 +319,21 @@ fn subtractGradient(@builtin(global_invocation_id) gid: vec3<u32>) {
 
   var vel = readVelocity(x, y);
 
-  // Subtract pressure gradient
+  // Subtract pressure gradient (projection step)
   vel.x -= 0.5 * (pR - pL);
   vel.y -= 0.5 * (pT - pB);
+
+  // Vorticity confinement: amplifies existing vortices to prevent dissipation
+  let wC = cellCurl(x, y);
+  let wL = cellCurl(clampX(i32(x) - 1), y);
+  let wR = cellCurl(clampX(i32(x) + 1), y);
+  let wB = cellCurl(x, clampY(i32(y) - 1));
+  let wT = cellCurl(x, clampY(i32(y) + 1));
+
+  var N = vec2<f32>(abs(wR) - abs(wL), abs(wT) - abs(wB)) * 0.5;
+  let nLen = length(N);
+  if (nLen > 0.0001) { N /= nLen; }
+  vel += vec2<f32>(N.y * wC, -N.x * wC) * 0.4 * params.dt;
 
   // Enforce boundary: zero normal velocity at walls
   if (x == 0u) { vel.x = max(vel.x, 0.0); }
