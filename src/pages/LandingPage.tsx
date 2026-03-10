@@ -126,10 +126,28 @@ export const LandingPage: React.FC = () => {
       ready: true, isNew: true,
     },
     {
-      id: 'fluid', title: 'Fluid Sim', path: '/play',
-      desc: 'GPU Navier-Stokes 유체 시뮬레이션.',
+      id: 'audio', title: 'Audio Visualizer', path: '/audio',
+      desc: '마이크/음악에 반응하는 GPU 파티클 비주얼. 원형 스펙트럼, 파티클 필드, 웨이브폼.',
+      icon: '🎵', gradient: 'linear-gradient(135deg, #f43f5e, #ec4899)',
+      ready: true, isNew: true,
+    },
+    {
+      id: 'galaxy', title: 'N-Body Galaxy', path: '/galaxy',
+      desc: '2만 개 별의 중력 시뮬레이션. 나선 은하, 충돌, 링 형성.',
+      icon: '🌌', gradient: 'linear-gradient(135deg, #6366f1, #0ea5e9)',
+      ready: true, isNew: true,
+    },
+    {
+      id: 'wave', title: 'Wave Equation', path: '/wave',
+      desc: '2D 파동 방정식. 터치로 물결을 만들고 간섭 패턴을 관찰.',
+      icon: '💧', gradient: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
+      ready: true, isNew: true,
+    },
+    {
+      id: 'fluid', title: 'Fluid Sim', path: '/fluid',
+      desc: 'Navier-Stokes 유체 시뮬레이션. 드래그로 컬러풀한 유체를 만들어보세요.',
       icon: '🌊', gradient: 'linear-gradient(135deg, #0ea5e9, #6366f1)',
-      ready: false, isNew: false,
+      ready: true, isNew: true,
     },
   ];
 
@@ -150,7 +168,7 @@ export const LandingPage: React.FC = () => {
           <div className="hero-features">
             <span className="hero-chip">500K+ Particles</span>
             <span className="hero-chip">Real-time GPU Compute</span>
-            <span className="hero-chip">7 Simulations</span>
+            <span className="hero-chip">11 Simulations</span>
           </div>
 
           <div className={`gpu-status-bar status-${gpuStatus}`}>
