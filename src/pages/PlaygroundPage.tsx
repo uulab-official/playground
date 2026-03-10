@@ -1,10 +1,13 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulationStore, type PresetType, type MaterialType } from '../stores/useSimulationStore';
 import { WebGPUCanvas } from '../components/WebGPUCanvas';
 import { FPSGraph } from '../components/FPSGraph';
 import { DebugOverlay } from '../components/DebugOverlay';
 import { checkWebGPUSupport } from '../lib/webgpu';
+import { useSimKeyboard } from '../hooks/useSimKeyboard';
+import { ShareButton } from '../components/ShareButton';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 
 const PRESETS: { id: PresetType; label: string; icon: string }[] = [
   { id: 'default', label: 'Scatter', icon: '✦' },
@@ -28,6 +31,7 @@ function formatCount(n: number): string {
 
 export const PlaygroundPage: React.FC = () => {
   const navigate = useNavigate();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const {
     particleCount, fps, isPaused, timeScale,
     gravity, damping, brushSize, activePreset, materialType,
@@ -42,6 +46,12 @@ export const PlaygroundPage: React.FC = () => {
   const [supportChecked, setSupportChecked] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(true);
   const [toolbarOpen, setToolbarOpen] = useState(true);
+
+  // Keep canvasRef in sync with the WebGPUCanvas-managed canvas element
+  useEffect(() => {
+    const el = document.querySelector('canvas') as HTMLCanvasElement | null;
+    if (el) (canvasRef as React.MutableRefObject<HTMLCanvasElement | null>).current = el;
+  });
 
   useEffect(() => {
     checkWebGPUSupport().then((ok) => {
@@ -85,6 +95,12 @@ export const PlaygroundPage: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
+
+  useSimKeyboard({
+    onPause: () => togglePause(),
+    onReset: () => requestReset(),
+    onScreenshot: () => handleScreenshot(),
+  });
 
   if (!supportChecked) {
     return (
@@ -167,6 +183,7 @@ export const PlaygroundPage: React.FC = () => {
                 <span className="toolbar-icon">📷</span>
                 <span className="toolbar-label">Capture</span>
               </button>
+              <ShareButton canvasRef={canvasRef} title="Particle Drop" />
               <button className="toolbar-btn" onClick={handleCopySeed} title="Copy Seed">
                 <span className="toolbar-icon">🔗</span>
                 <span className="toolbar-label">Seed</span>
@@ -293,6 +310,16 @@ export const PlaygroundPage: React.FC = () => {
           </aside>
         )}
       </div>
+      <TutorialOverlay
+        id="particle"
+        steps={[
+          { icon: '🖱️', title: '드래그', desc: '마우스 드래그로 파티클에 힘 적용' },
+          { icon: '✦', title: '50만 파티클', desc: '슬라이더로 파티클 수 조절' },
+          { icon: '🎮', title: '프리셋', desc: '폭발/소용돌이/분수 등 프리셋 선택' },
+          { icon: '⌨️', title: '단축키', desc: 'Space=일시정지, R=초기화, Esc=홈' },
+        ]}
+        onClose={() => {}}
+      />
     </div>
   );
 };

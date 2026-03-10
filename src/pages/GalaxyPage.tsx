@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { initWebGPU } from '../lib/webgpu';
 import galaxyComputeCode from '../shaders/galaxy_compute.wgsl?raw';
 import galaxyRenderCode from '../shaders/galaxy_render.wgsl?raw';
+import { useSimKeyboard } from '../hooks/useSimKeyboard';
+import { ShareButton } from '../components/ShareButton';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 
 const MAX_BODIES = 20000;
 const BODY_FLOATS = 8; // x, y, vx, vy, mass, brightness, temperature, age
@@ -282,6 +285,12 @@ export const GalaxyPage: React.FC = () => {
     link.click();
   }, []);
 
+  useSimKeyboard({
+    onPause: () => setPaused(p => !p),
+    onReset: resetSimulation,
+    onScreenshot: takeScreenshot,
+  });
+
   const render = useCallback((time: number) => {
     if (!activeRef.current) return;
     const gpu = gpuRef.current;
@@ -504,6 +513,7 @@ export const GalaxyPage: React.FC = () => {
             </button>
             <button className="action-btn" onClick={resetSimulation}>↻ Reset</button>
             <button className="action-btn" onClick={takeScreenshot}>📷</button>
+            <ShareButton canvasRef={canvasRef} title="N-Body Galaxy" />
           </div>
 
           <div className="hints">
@@ -513,6 +523,16 @@ export const GalaxyPage: React.FC = () => {
           </div>
         </aside>
       </div>
+      <TutorialOverlay
+        id="galaxy"
+        steps={[
+          { icon: '🖱️', title: '클릭', desc: '좌클릭=중력 끌어당김, 우클릭=밀어냄' },
+          { icon: '🌌', title: '은하 형성', desc: '수만 개 별의 중력 시뮬레이션' },
+          { icon: '✨', title: '흑체 색상', desc: '별 온도에 따라 색상 변화 (빨강→파랑)' },
+          { icon: '🎮', title: '프리셋', desc: '나선/충돌/링/랜덤 초기 분포' },
+        ]}
+        onClose={() => {}}
+      />
     </div>
   );
 };

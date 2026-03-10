@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { initWebGPU } from '../lib/webgpu';
+import { useSimKeyboard } from '../hooks/useSimKeyboard';
+import { ShareButton } from '../components/ShareButton';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 import raymarchCode from '../shaders/raymarch.wgsl?raw';
 
 type SceneId = 0 | 1 | 2 | 3;
@@ -153,6 +156,23 @@ export const RayMarchPage: React.FC = () => {
     };
   }, []);
 
+  useSimKeyboard({
+    onPause: () => {},
+    onReset: () => {
+      stateRef.current.angleX = 0.5;
+      stateRef.current.angleY = 0.3;
+      stateRef.current.zoom = 1.0;
+      setZoom(1.0);
+    },
+    onScreenshot: () => {
+      const c = canvasRef.current;
+      if (!c) return;
+      const a = document.createElement('a');
+      a.download = `raymarch-${Date.now()}.png`;
+      a.href = c.toDataURL('image/png'); a.click();
+    },
+  });
+
   useEffect(() => { stateRef.current.sceneId = scene; }, [scene]);
   useEffect(() => { stateRef.current.fogDensity = fog; }, [fog]);
 
@@ -205,6 +225,7 @@ export const RayMarchPage: React.FC = () => {
               a.download = `raymarch-${Date.now()}.png`;
               a.href = c.toDataURL('image/png'); a.click();
             }}>📷</button>
+            <ShareButton canvasRef={canvasRef} title="Ray Marching" />
           </div>
           <div className="hints">
             <span>Drag: rotate camera · Scroll: zoom</span>
@@ -212,6 +233,12 @@ export const RayMarchPage: React.FC = () => {
           </div>
         </aside>
       </div>
+      <TutorialOverlay id="raymarch" steps={[
+        { icon: '🖱️', title: '드래그', desc: '마우스 드래그로 카메라 회전' },
+        { icon: '🔍', title: '줌', desc: '스크롤로 카메라 거리 조절' },
+        { icon: '🎨', title: '씬 전환', desc: '메타볼/멩거 스폰지/지형 선택' },
+        { icon: '🔄', title: '자동 회전', desc: '자동 회전 토글 가능' },
+      ]} onClose={() => {}} />
     </div>
   );
 };

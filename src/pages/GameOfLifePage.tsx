@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { initWebGPU } from '../lib/webgpu';
 import golComputeCode from '../shaders/gol_compute.wgsl?raw';
 import golRenderCode from '../shaders/gol_render.wgsl?raw';
+import { useSimKeyboard } from '../hooks/useSimKeyboard';
+import { ShareButton } from '../components/ShareButton';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 
 const GRID_W = 512;
 const GRID_H = 512;
@@ -274,6 +277,21 @@ export const GameOfLifePage: React.FC = () => {
   useEffect(() => { colorRef.current = colorIdx; }, [colorIdx]);
   useEffect(() => { speedRef.current = speed; }, [speed]);
 
+  const handleScreenshot = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = `game-of-life-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }, []);
+
+  useSimKeyboard({
+    onPause: () => setPaused(p => !p),
+    onReset: () => resetWithPattern('random'),
+    onScreenshot: handleScreenshot,
+  });
+
   const colors = ['Matrix', 'Indigo', 'Amber', 'Cyan'];
   const patterns: { id: Pattern; label: string }[] = [
     { id: 'random', label: 'Random' },
@@ -335,6 +353,7 @@ export const GameOfLifePage: React.FC = () => {
               {paused ? '▶ Play' : '⏸ Pause'}
             </button>
             <button className="action-btn" onClick={() => resetWithPattern('random')}>↻ Random</button>
+            <ShareButton canvasRef={canvasRef} title="Game of Life" />
           </div>
           <div className="hints">
             <span>Click/drag to draw cells</span>
@@ -342,6 +361,16 @@ export const GameOfLifePage: React.FC = () => {
           </div>
         </aside>
       </div>
+      <TutorialOverlay
+        id="life"
+        steps={[
+          { icon: '🖱️', title: '클릭', desc: '셀을 클릭해서 살리거나 죽이기' },
+          { icon: '🧬', title: 'Conway 법칙', desc: '3개 이웃=탄생, 2-3개=생존' },
+          { icon: '🎮', title: '패턴', desc: 'Glider Gun, Pulsar 등 프리셋' },
+          { icon: '⌨️', title: '단축키', desc: 'Space=일시정지, R=초기화' },
+        ]}
+        onClose={() => {}}
+      />
     </div>
   );
 };

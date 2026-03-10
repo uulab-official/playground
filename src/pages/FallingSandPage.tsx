@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { initWebGPU } from '../lib/webgpu';
+import { useSimKeyboard } from '../hooks/useSimKeyboard';
+import { ShareButton } from '../components/ShareButton';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 import sandComputeCode from '../shaders/sand_compute.wgsl?raw';
 import sandRenderCode from '../shaders/sand_render.wgsl?raw';
 
@@ -281,6 +284,18 @@ export const FallingSandPage: React.FC = () => {
     };
   }, []);
 
+  useSimKeyboard({
+    onPause: () => setPaused(p => !p),
+    onReset: () => { clearGrid(); },
+    onScreenshot: () => {
+      const c = canvasRef.current;
+      if (!c) return;
+      const a = document.createElement('a');
+      a.download = `sand-${Date.now()}.png`;
+      a.href = c.toDataURL('image/png'); a.click();
+    },
+  });
+
   useEffect(() => { pausedRef.current = paused; }, [paused]);
   useEffect(() => {
     materialRef.current = MATERIALS.find(m => m.id === material)?.code ?? 1;
@@ -342,6 +357,7 @@ export const FallingSandPage: React.FC = () => {
               a.download = `sand-${Date.now()}.png`;
               a.href = c.toDataURL('image/png'); a.click();
             }}>📷</button>
+            <ShareButton canvasRef={canvasRef} title="Falling Sand" />
           </div>
           <div className="hints">
             <span>Click/drag to place materials</span>
@@ -350,6 +366,12 @@ export const FallingSandPage: React.FC = () => {
           </div>
         </aside>
       </div>
+      <TutorialOverlay id="sand" steps={[
+        { icon: '🖱️', title: '드래그', desc: '클릭/드래그로 재료 배치' },
+        { icon: '🏖️', title: '재료', desc: '모래/물/불/돌/증기 선택' },
+        { icon: '🔥', title: '상호작용', desc: '불+물=증기, 모래는 물에 가라앉음' },
+        { icon: '⌨️', title: '단축키', desc: 'Space=일시정지, R=화면 초기화' },
+      ]} onClose={() => {}} />
     </div>
   );
 };

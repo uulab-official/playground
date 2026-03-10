@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { initWebGPU } from '../lib/webgpu';
 import boidsComputeCode from '../shaders/boids_compute.wgsl?raw';
 import boidsRenderCode from '../shaders/boids_render.wgsl?raw';
+import { useSimKeyboard } from '../hooks/useSimKeyboard';
+import { ShareButton } from '../components/ShareButton';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 
 const MAX_BOIDS = 5000;
 
@@ -272,6 +275,21 @@ export const BoidsPage: React.FC = () => {
     };
   }, []);
 
+  const handleScreenshot = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = `boids-flock-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }, []);
+
+  useSimKeyboard({
+    onPause: () => setPaused(p => !p),
+    onReset: () => resetBoids(),
+    onScreenshot: handleScreenshot,
+  });
+
   return (
     <div className="app-container dark">
       <main className="canvas-container">
@@ -340,6 +358,7 @@ export const BoidsPage: React.FC = () => {
               {paused ? '▶ Play' : '⏸ Pause'}
             </button>
             <button className="action-btn" onClick={resetBoids}>↻ Reset</button>
+            <ShareButton canvasRef={canvasRef} title="Boids Flock" />
           </div>
 
           <div className="hints">
@@ -348,6 +367,16 @@ export const BoidsPage: React.FC = () => {
           </div>
         </aside>
       </div>
+      <TutorialOverlay
+        id="boids"
+        steps={[
+          { icon: '🖱️', title: '클릭', desc: '클릭하면 보이드가 흩어짐' },
+          { icon: '🐦', title: '군집 알고리즘', desc: '분리/정렬/응집 3가지 힘' },
+          { icon: '⚙️', title: '파라미터', desc: '힘의 세기와 범위 실시간 조절' },
+          { icon: '⌨️', title: '단축키', desc: 'Space=일시정지, R=초기화' },
+        ]}
+        onClose={() => {}}
+      />
     </div>
   );
 };

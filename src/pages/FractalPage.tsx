@@ -2,6 +2,9 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { initWebGPU } from '../lib/webgpu';
 import fractalShaderCode from '../shaders/fractal.wgsl?raw';
+import { useSimKeyboard } from '../hooks/useSimKeyboard';
+import { ShareButton } from '../components/ShareButton';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 
 type FractalMode = 'mandelbrot' | 'julia';
 type ColorMode = 'classic' | 'fire' | 'ocean' | 'neon';
@@ -210,6 +213,28 @@ export const FractalPage: React.FC = () => {
     { label: 'Mini Mandelbrot', cx: -1.768778, cy: -0.001738, z: 5000 },
   ];
 
+  const handleReset = useCallback(() => {
+    stateRef.current.centerX = fractalMode === 'mandelbrot' ? -0.5 : 0;
+    stateRef.current.centerY = 0;
+    stateRef.current.zoom = 1;
+    setZoom(1);
+    setMaxIter(200);
+  }, [fractalMode]);
+
+  const handleScreenshot = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = `fractal-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }, []);
+
+  useSimKeyboard({
+    onReset: handleReset,
+    onScreenshot: handleScreenshot,
+  });
+
   return (
     <div className="app-container dark">
       <main className="canvas-container">
@@ -301,21 +326,9 @@ export const FractalPage: React.FC = () => {
           )}
 
           <div className="control-group actions-row">
-            <button className="action-btn primary" onClick={() => {
-              stateRef.current.centerX = fractalMode === 'mandelbrot' ? -0.5 : 0;
-              stateRef.current.centerY = 0;
-              stateRef.current.zoom = 1;
-              setZoom(1);
-              setMaxIter(200);
-            }}>↻ Reset</button>
-            <button className="action-btn" onClick={() => {
-              const canvas = canvasRef.current;
-              if (!canvas) return;
-              const link = document.createElement('a');
-              link.download = `fractal-${Date.now()}.png`;
-              link.href = canvas.toDataURL('image/png');
-              link.click();
-            }}>📷</button>
+            <button className="action-btn primary" onClick={handleReset}>↻ Reset</button>
+            <button className="action-btn" onClick={handleScreenshot}>📷</button>
+            <ShareButton canvasRef={canvasRef} title="Fractal Explorer" />
           </div>
 
           <div className="hints">
@@ -324,6 +337,16 @@ export const FractalPage: React.FC = () => {
           </div>
         </aside>
       </div>
+      <TutorialOverlay
+        id="fractal"
+        steps={[
+          { icon: '🖱️', title: '드래그', desc: '마우스 드래그로 이동' },
+          { icon: '🔍', title: '줌', desc: '스크롤로 무한 확대/축소' },
+          { icon: '🔮', title: '줄리아 세트', desc: 'Julia 모드로 전환 가능' },
+          { icon: '🎨', title: '색상 모드', desc: '4가지 컬러 팔레트 선택' },
+        ]}
+        onClose={() => {}}
+      />
     </div>
   );
 };

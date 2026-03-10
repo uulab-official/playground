@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { initWebGPU } from '../lib/webgpu';
 import fluidComputeCode from '../shaders/fluid_compute.wgsl?raw';
 import fluidRenderCode from '../shaders/fluid_render.wgsl?raw';
+import { useSimKeyboard } from '../hooks/useSimKeyboard';
+import { ShareButton } from '../components/ShareButton';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 
 const GRID_W = 512;
 const GRID_H = 512;
@@ -220,6 +223,21 @@ export const FluidSimPage: React.FC = () => {
     gpu.presIdx = 0;
     gpu.dyeIdx = 0;
   }, []);
+
+  const takeScreenshot = useCallback(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const a = document.createElement('a');
+    a.download = `fluid-sim-${Date.now()}.png`;
+    a.href = c.toDataURL('image/png');
+    a.click();
+  }, []);
+
+  useSimKeyboard({
+    onPause: () => setPaused(p => !p),
+    onReset: clearBuffers,
+    onScreenshot: takeScreenshot,
+  });
 
   const render = useCallback(() => {
     if (!activeRef.current) return;
@@ -546,14 +564,8 @@ export const FluidSimPage: React.FC = () => {
               {paused ? '▶ Play' : '⏸ Pause'}
             </button>
             <button className="action-btn" onClick={clearBuffers}>↻ Clear</button>
-            <button className="action-btn" onClick={() => {
-              const c = canvasRef.current;
-              if (!c) return;
-              const a = document.createElement('a');
-              a.download = `fluid-sim-${Date.now()}.png`;
-              a.href = c.toDataURL('image/png');
-              a.click();
-            }}>📷</button>
+            <button className="action-btn" onClick={takeScreenshot}>📷</button>
+            <ShareButton canvasRef={canvasRef} title="Fluid Sim" />
           </div>
           <div className="hints">
             <span>Click/drag to inject dye and force</span>
@@ -561,6 +573,16 @@ export const FluidSimPage: React.FC = () => {
           </div>
         </aside>
       </div>
+      <TutorialOverlay
+        id="fluid"
+        steps={[
+          { icon: '🖱️', title: '드래그', desc: '마우스 드래그로 유체에 힘과 염료 주입' },
+          { icon: '🌈', title: '자동 색상', desc: '시간에 따라 염료 색상이 자동 변경' },
+          { icon: '👁️', title: '디스플레이', desc: '염료/속도/압력/와도 시각화 전환' },
+          { icon: '⚙️', title: '물리', desc: '점성도, 확산, 압력 반복 횟수 조절' },
+        ]}
+        onClose={() => {}}
+      />
     </div>
   );
 };
