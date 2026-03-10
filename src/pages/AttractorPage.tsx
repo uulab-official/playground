@@ -288,73 +288,85 @@ export const AttractorPage: React.FC = () => {
   });
 
   return (
-    <div className="sim-page">
-      <canvas ref={canvasRef} className="sim-canvas" />
+    <div className="app-container dark">
+      <main className="canvas-container">
+        <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block', cursor: 'grab' }} />
+      </main>
 
-      <div className="sim-hud">
-        <button className="back-btn" onClick={() => navigate('/')}>← Home</button>
-        <div className="sim-info">
-          <h2>Strange Attractors</h2>
-          <p className="fps-counter">{fps} FPS · {(PARTICLE_COUNT / 1000).toFixed(0)}K particles</p>
-        </div>
-      </div>
-
-      <div className="sim-controls">
-        <div className="control-group">
-          <label>Attractor</label>
-          <div className="btn-row">
-            {ATTRACTOR_NAMES.map((name, i) => (
-              <button
-                key={name}
-                className={`preset-btn${attractorType === i ? ' active' : ''}`}
-                onClick={() => { setAttractorType(i); attractorRef.current = i; frameRef.current = 0; }}
-              >
-                {name}
-              </button>
-            ))}
+      <div className="ui-overlay">
+        <header className="ui-header">
+          <div className="header-left">
+            <button className="icon-btn" onClick={() => navigate('/')}>←</button>
+            <h1>Strange Attractors</h1>
+            <span className="badge">{(PARTICLE_COUNT / 1000).toFixed(0)}K particles</span>
           </div>
-        </div>
-
-        <div className="control-group">
-          <label>Color</label>
-          <div className="btn-row">
-            {COLOR_MODES.map((m, i) => (
-              <button
-                key={m}
-                className={`preset-btn${colorMode === i ? ' active' : ''}`}
-                onClick={() => { setColorMode(i); colorModeRef.current = i; }}
-              >
-                {m}
-              </button>
-            ))}
+          <div className="header-right">
+            <div className="stats">
+              <span className={`fps ${fps >= 55 ? 'fps-good' : fps >= 30 ? 'fps-mid' : 'fps-low'}`}>{fps} FPS</span>
+            </div>
           </div>
-        </div>
+        </header>
 
-        <button
-          className={`action-btn${autoRotate ? ' active' : ''}`}
-          onClick={() => { const next = !autoRotateRef.current; setAutoRotate(next); autoRotateRef.current = next; }}
-        >
-          {autoRotate ? '⏸ Camera' : '▶ Rotate'}
-        </button>
+        <aside className="ui-controls">
+          <div className="control-group">
+            <label>Attractor</label>
+            <div className="preset-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+              {ATTRACTOR_NAMES.map((name, i) => (
+                <button
+                  key={name}
+                  className={`preset-btn${attractorType === i ? ' active' : ''}`}
+                  onClick={() => { setAttractorType(i); attractorRef.current = i; frameRef.current = 0; }}
+                >
+                  <span className="preset-label">{name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
 
-        <button
-          className={`action-btn${paused ? ' active' : ''}`}
-          onClick={() => { const next = !pausedRef.current; setPaused(next); pausedRef.current = next; }}
-        >
-          {paused ? '▶ Resume' : '⏸ Pause'}
-        </button>
+          <div className="control-group">
+            <label>Color</label>
+            <div className="preset-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+              {COLOR_MODES.map((m, i) => (
+                <button
+                  key={m}
+                  className={`preset-btn${colorMode === i ? ' active' : ''}`}
+                  onClick={() => { setColorMode(i); colorModeRef.current = i; }}
+                >
+                  <span className="preset-label">{m}</span>
+                </button>
+              ))}
+            </div>
+          </div>
 
-        <ShareButton canvasRef={canvasRef} title="Strange Attractor" params={ATTRACTOR_NAMES[attractorType]} />
+          <div className="control-group actions-row">
+            <button
+              className="action-btn primary"
+              onClick={() => { const next = !pausedRef.current; setPaused(next); pausedRef.current = next; }}
+            >
+              {paused ? '▶ Resume' : '⏸ Pause'}
+            </button>
+            <button
+              className="action-btn"
+              onClick={() => { const next = !autoRotateRef.current; setAutoRotate(next); autoRotateRef.current = next; }}
+            >
+              {autoRotate ? '🔄 Auto' : '🔄 Off'}
+            </button>
+            <ShareButton canvasRef={canvasRef} title="Strange Attractor" params={ATTRACTOR_NAMES[attractorType]} />
+          </div>
+
+          <div className="hints">
+            <span>Drag to orbit · Scroll to zoom</span>
+            <span>Space = pause · Switch attractor to reset</span>
+          </div>
+        </aside>
       </div>
-
-      <div className="sim-hints">Drag to orbit · Scroll to zoom · Space to pause</div>
 
       <TutorialOverlay
         id="attractor"
         steps={[
-          { icon: '🌀', title: 'Strange Attractors', desc: '300K particles tracing chaotic dynamical systems on the GPU.' },
-          { icon: '🔀', title: 'Attractors', desc: 'Switch between Lorenz, Thomas, Halvorsen, and Aizawa attractors — each with a unique shape.' },
-          { icon: '🦋', title: 'Chaos', desc: 'Particles start nearby but diverge exponentially — the butterfly effect in real time.' },
+          { icon: '🌀', title: 'Strange Attractors', desc: '300K particles tracing chaotic dynamical systems in real time on the GPU.' },
+          { icon: '🔀', title: 'Switch', desc: 'Lorenz, Thomas, Halvorsen, Aizawa — each has a completely different shape and dynamics.' },
+          { icon: '🦋', title: 'Chaos', desc: 'Nearby particles diverge exponentially over time — the butterfly effect visualized.' },
         ]}
         onClose={() => {}}
       />

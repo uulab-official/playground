@@ -215,71 +215,79 @@ export const MandelbulbPage: React.FC = () => {
   });
 
   return (
-    <div className="sim-page">
-      <canvas ref={canvasRef} className="sim-canvas" />
+    <div className="app-container dark">
+      <main className="canvas-container">
+        <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block', cursor: 'grab' }} />
+      </main>
 
-      <div className="sim-hud">
-        <button className="back-btn" onClick={() => navigate('/')}>← Home</button>
-        <div className="sim-info">
-          <h2>Mandelbulb 3D</h2>
-          <p className="fps-counter">{fps} FPS</p>
-        </div>
-      </div>
-
-      <div className="sim-controls">
-        <div className="control-group">
-          <label>Power</label>
-          <div className="btn-row">
-            {POWERS.map(p => (
-              <button
-                key={p}
-                className={`preset-btn${power === p ? ' active' : ''}`}
-                onClick={() => { setPower(p); powerRef.current = p; }}
-              >
-                {p}
-              </button>
-            ))}
+      <div className="ui-overlay">
+        <header className="ui-header">
+          <div className="header-left">
+            <button className="icon-btn" onClick={() => navigate('/')}>←</button>
+            <h1>Mandelbulb 3D</h1>
           </div>
-        </div>
-
-        <div className="control-group">
-          <label>Color</label>
-          <div className="btn-row">
-            {COLOR_MODES.map((m, i) => (
-              <button
-                key={m}
-                className={`preset-btn${colorMode === i ? ' active' : ''}`}
-                onClick={() => { setColorMode(i); colorModeRef.current = i; }}
-              >
-                {m}
-              </button>
-            ))}
+          <div className="header-right">
+            <div className="stats">
+              <span className={`fps ${fps >= 55 ? 'fps-good' : fps >= 30 ? 'fps-mid' : 'fps-low'}`}>{fps} FPS</span>
+            </div>
           </div>
-        </div>
+        </header>
 
-        <button
-          className={`action-btn${autoRotate ? ' active' : ''}`}
-          onClick={() => {
-            const next = !autoRotateRef.current;
-            setAutoRotate(next);
-            autoRotateRef.current = next;
-          }}
-        >
-          {autoRotate ? '⏸ Pause' : '▶ Rotate'}
-        </button>
+        <aside className="ui-controls">
+          <div className="control-group">
+            <label>Power</label>
+            <div className="preset-grid" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
+              {POWERS.map(p => (
+                <button
+                  key={p}
+                  className={`preset-btn${power === p ? ' active' : ''}`}
+                  onClick={() => { setPower(p); powerRef.current = p; }}
+                >
+                  <span className="preset-label">{p}</span>
+                </button>
+              ))}
+            </div>
+          </div>
 
-        <ShareButton canvasRef={canvasRef} title="Mandelbulb 3D" params={`power=${power}`} />
+          <div className="control-group">
+            <label>Color</label>
+            <div className="preset-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+              {COLOR_MODES.map((m, i) => (
+                <button
+                  key={m}
+                  className={`preset-btn${colorMode === i ? ' active' : ''}`}
+                  onClick={() => { setColorMode(i); colorModeRef.current = i; }}
+                >
+                  <span className="preset-label">{m}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="control-group actions-row">
+            <button
+              className="action-btn primary"
+              onClick={() => { const next = !autoRotateRef.current; setAutoRotate(next); autoRotateRef.current = next; }}
+            >
+              {autoRotate ? '⏸ Pause' : '▶ Rotate'}
+            </button>
+            <ShareButton canvasRef={canvasRef} title="Mandelbulb 3D" params={`power=${power}`} />
+          </div>
+
+          <div className="hints">
+            <span>Drag to orbit · Scroll to zoom</span>
+            <span>Space = pause rotation · R = reset</span>
+          </div>
+        </aside>
       </div>
-
-      <div className="sim-hints">Drag to orbit · Scroll to zoom · Space to toggle rotation</div>
 
       <TutorialOverlay
         id="mandelbulb"
         steps={[
           { icon: '🔷', title: 'Mandelbulb 3D', desc: 'A 3D fractal rendered in real-time using GPU ray marching.' },
           { icon: '🖱️', title: 'Orbit', desc: 'Drag to rotate the camera around the fractal. Scroll to zoom.' },
-          { icon: '⚡', title: 'Power', desc: 'Change the power to transform the fractal shape entirely. Try 9 or 10 for spiky forms.' },
-          { icon: '🎨', title: 'Color', desc: 'Switch color modes to see the fractal from different mathematical perspectives.' },
+          { icon: '⚡', title: 'Power', desc: 'Change the power (6–10) to get completely different fractal shapes.' },
+          { icon: '🎨', title: 'Color', desc: 'Rainbow uses orbit trap math, Normals shows surface curvature, Depth shows distance.' },
         ]}
         onClose={() => {}}
       />
