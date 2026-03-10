@@ -127,8 +127,8 @@ export const WaveEquationPage: React.FC = () => {
         layout: cBGL,
         entries: [
           { binding: 0, resource: { buffer: computeUB } },
-          { binding: 1, resource: { buffer: heightBuffers[cur] } },
-          { binding: 2, resource: { buffer: heightBuffers[prev] } },
+          { binding: 1, resource: { buffer: heightBuffers[prev] } }, // shader.prev = CPU.prev (older)
+          { binding: 2, resource: { buffer: heightBuffers[cur] } },  // shader.curr = CPU.cur (newer)
           { binding: 3, resource: { buffer: heightBuffers[out] } },
         ],
       })
@@ -280,24 +280,22 @@ export const WaveEquationPage: React.FC = () => {
     }
 
     // Compute uniforms (16 floats = 64 bytes)
+    // Order MUST match WGSL Params struct: gridW, gridH, mouseX, mouseY,
+    // mouseActive, frame, damping, speed, mouseRadius, dt, isPaused, padding
     const cu = new Float32Array(16);
     const cu32 = new Uint32Array(cu.buffer);
-    cu32[0] = GRID_W;          // gridW
-    cu32[1] = GRID_H;          // gridH
-    cu[2] = p.damping;         // damping
-    cu[3] = p.speed;           // speed
-    cu[4] = m.x;               // mouseX (0-1 normalized)
-    cu[5] = m.y;               // mouseY (0-1 normalized)
-    cu32[6] = m.active;        // mouseActive
-    cu[7] = p.dropRadius;      // mouseRadius
-    cu32[8] = frameRef.current; // frame
-    cu[9] = 1.0 / 60.0;       // dt
-    cu[10] = p.dropStrength;   // dropStrength
-    cu[11] = 0;                // pad
-    cu[12] = 0;                // pad
-    cu[13] = 0;                // pad
-    cu[14] = 0;                // pad
-    cu[15] = 0;                // pad
+    cu32[0] = GRID_W;              // gridW
+    cu32[1] = GRID_H;              // gridH
+    cu[2]   = m.x;                 // mouseX (0-1 normalized)
+    cu[3]   = m.y;                 // mouseY (0-1 normalized)
+    cu32[4] = m.active;            // mouseActive
+    cu32[5] = frameRef.current;    // frame
+    cu[6]   = p.damping;           // damping
+    cu[7]   = p.speed;             // speed
+    cu[8]   = p.dropRadius;        // mouseRadius
+    cu[9]   = 1.0 / 60.0;         // dt
+    cu32[10] = p.paused ? 1 : 0;  // isPaused
+    cu32[11] = 0;                  // padding
     gpu.device.queue.writeBuffer(gpu.computeUniformBuffer, 0, cu);
 
     // Render uniforms (8 floats = 32 bytes)
@@ -367,7 +365,7 @@ export const WaveEquationPage: React.FC = () => {
     const rect = canvas.getBoundingClientRect();
     return {
       x: (clientX - rect.left) / rect.width,
-      y: 1 - (clientY - rect.top) / rect.height,
+      y: (clientY - rect.top) / rect.height,
     };
   }, []);
 

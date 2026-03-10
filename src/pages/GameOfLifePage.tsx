@@ -227,7 +227,7 @@ export const GameOfLifePage: React.FC = () => {
     if (!gpu || !canvas) return;
     const rect = canvas.getBoundingClientRect();
     const x = Math.floor((e.clientX - rect.left) / rect.width * GRID_W);
-    const y = Math.floor((1 - (e.clientY - rect.top) / rect.height) * GRID_H);
+    const y = Math.floor((e.clientY - rect.top) / rect.height * GRID_H);
     if (x < 0 || x >= GRID_W || y < 0 || y >= GRID_H) return;
     const idx = y * GRID_W + x;
     const data = new Uint32Array([1]);

@@ -212,7 +212,7 @@ export const ReactionDiffusionPage: React.FC = () => {
     const onMove = (e: MouseEvent) => {
       const r = canvas.getBoundingClientRect();
       mouseRef.current.x = (e.clientX - r.left) / r.width;
-      mouseRef.current.y = 1 - (e.clientY - r.top) / r.height;
+      mouseRef.current.y = (e.clientY - r.top) / r.height;
     };
     const onDown = () => { mouseRef.current.pressed = true; };
     const onUp = () => { mouseRef.current.pressed = false; };
