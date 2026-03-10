@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { initWebGPU } from '../lib/webgpu';
 import audioComputeCode from '../shaders/audio_compute.wgsl?raw';
 import audioRenderCode from '../shaders/audio_render.wgsl?raw';
+import { useSimKeyboard } from '../hooks/useSimKeyboard';
+import { ShareButton } from '../components/ShareButton';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 
 const MAX_PARTICLES = 4096;
 const FFT_SIZE = 512;
@@ -190,6 +193,21 @@ export const AudioVisualizerPage: React.FC = () => {
       startFile(file);
     }
   }, [startFile]);
+
+  const takeScreenshot = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = `audio-visualizer-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }, []);
+
+  useSimKeyboard({
+    onPause: stopAudio,
+    onReset: stopAudio,
+    onScreenshot: takeScreenshot,
+  });
 
   const initGPU = useCallback(async () => {
     const canvas = canvasRef.current;
@@ -628,6 +646,7 @@ export const AudioVisualizerPage: React.FC = () => {
             <button className="action-btn" onClick={stopAudio}>
               Stop Audio
             </button>
+            <ShareButton canvasRef={canvasRef} title="Audio Visualizer" />
           </div>
 
           <div className="hints">
@@ -637,6 +656,16 @@ export const AudioVisualizerPage: React.FC = () => {
           </div>
         </aside>
       </div>
+      <TutorialOverlay
+        id="audio"
+        steps={[
+          { icon: '🎤', title: '마이크', desc: '마이크 버튼으로 실시간 오디오 입력' },
+          { icon: '🎵', title: '파일', desc: '음악 파일 업로드도 가능' },
+          { icon: '🌈', title: '비주얼 모드', desc: '원형/파티클/웨이브폼 3가지' },
+          { icon: '⚙️', title: '감도', desc: '감도와 파티클 크기 조절 가능' },
+        ]}
+        onClose={() => {}}
+      />
     </div>
   );
 };

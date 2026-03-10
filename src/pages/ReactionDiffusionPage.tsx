@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { initWebGPU } from '../lib/webgpu';
+import { useSimKeyboard } from '../hooks/useSimKeyboard';
+import { ShareButton } from '../components/ShareButton';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 import rdComputeCode from '../shaders/reaction_diffusion.wgsl?raw';
 import rdRenderCode from '../shaders/rd_render.wgsl?raw';
 
@@ -246,6 +249,18 @@ export const ReactionDiffusionPage: React.FC = () => {
   useEffect(() => { paramsRef.current.colorMode = colorMode; }, [colorMode]);
   useEffect(() => { paramsRef.current.steps = stepsPerFrame; }, [stepsPerFrame]);
 
+  useSimKeyboard({
+    onPause: () => setPaused(p => !p),
+    onReset: () => { resetGrid(); },
+    onScreenshot: () => {
+      const c = canvasRef.current;
+      if (!c) return;
+      const a = document.createElement('a');
+      a.download = `rd-${preset}-${Date.now()}.png`;
+      a.href = c.toDataURL('image/png'); a.click();
+    },
+  });
+
   const colors = ['Teal/Coral', 'Purple/Gold', 'Grayscale', 'Infrared'];
 
   return (
@@ -306,6 +321,7 @@ export const ReactionDiffusionPage: React.FC = () => {
               a.download = `rd-${preset}-${Date.now()}.png`;
               a.href = c.toDataURL('image/png'); a.click();
             }}>📷</button>
+            <ShareButton canvasRef={canvasRef} title="Reaction-Diffusion" />
           </div>
           <div className="hints">
             <span>Click/drag to seed chemical B</span>
@@ -313,6 +329,12 @@ export const ReactionDiffusionPage: React.FC = () => {
           </div>
         </aside>
       </div>
+      <TutorialOverlay id="reaction" steps={[
+        { icon: '🖱️', title: '클릭', desc: '클릭으로 화학 B 주입' },
+        { icon: '🧫', title: 'Gray-Scott', desc: '공급률과 소멸률로 패턴 변화' },
+        { icon: '🎨', title: '프리셋', desc: 'Coral, Mitosis, Waves 등 5가지' },
+        { icon: '🌈', title: '색상', desc: '4가지 컬러 모드' },
+      ]} onClose={() => {}} />
     </div>
   );
 };

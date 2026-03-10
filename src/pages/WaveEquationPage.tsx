@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { initWebGPU } from '../lib/webgpu';
 import waveComputeCode from '../shaders/wave_compute.wgsl?raw';
 import waveRenderCode from '../shaders/wave_render.wgsl?raw';
+import { useSimKeyboard } from '../hooks/useSimKeyboard';
+import { ShareButton } from '../components/ShareButton';
+import { TutorialOverlay } from '../components/TutorialOverlay';
 
 const GRID_W = 512;
 const GRID_H = 512;
@@ -198,6 +201,21 @@ export const WaveEquationPage: React.FC = () => {
     gpu.bufferIndex = 0;
     frameRef.current = 0;
   }, []);
+
+  const takeScreenshot = useCallback(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const a = document.createElement('a');
+    a.download = `wave-${Date.now()}.png`;
+    a.href = c.toDataURL('image/png');
+    a.click();
+  }, []);
+
+  useSimKeyboard({
+    onPause: () => setPaused(p => !p),
+    onReset: clearBuffers,
+    onScreenshot: takeScreenshot,
+  });
 
   // ────────────────── PRESET HELPERS ──────────────────
 
@@ -571,19 +589,8 @@ export const WaveEquationPage: React.FC = () => {
               {paused ? '▶ Play' : '⏸ Pause'}
             </button>
             <button className="action-btn" onClick={clearBuffers}>↻ Clear</button>
-            <button
-              className="action-btn"
-              onClick={() => {
-                const c = canvasRef.current;
-                if (!c) return;
-                const a = document.createElement('a');
-                a.download = `wave-${Date.now()}.png`;
-                a.href = c.toDataURL('image/png');
-                a.click();
-              }}
-            >
-              📷
-            </button>
+            <button className="action-btn" onClick={takeScreenshot}>📷</button>
+            <ShareButton canvasRef={canvasRef} title="Wave Equation" />
           </div>
 
           <div className="hints">
@@ -592,6 +599,16 @@ export const WaveEquationPage: React.FC = () => {
           </div>
         </aside>
       </div>
+      <TutorialOverlay
+        id="wave"
+        steps={[
+          { icon: '🖱️', title: '클릭', desc: '클릭/드래그로 파동 생성' },
+          { icon: '💧', title: '프리셋', desc: '비/파문/이중슬릿 자동 파동' },
+          { icon: '🌊', title: '색상 모드', desc: '바다/네온/불/흑백 4가지' },
+          { icon: '⚙️', title: '물리', desc: '파동 속도, 감쇠, 세기 조절' },
+        ]}
+        onClose={() => {}}
+      />
     </div>
   );
 };

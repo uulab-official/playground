@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 
 interface ShareButtonProps {
-  canvasRef: React.RefObject<HTMLCanvasElement>;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
   title: string;
   params?: string;
 }
