@@ -205,7 +205,7 @@ export const FallingSandPage: React.FC = () => {
     const getGridCoords = (e: MouseEvent) => {
       const r = canvas.getBoundingClientRect();
       const x = Math.floor((e.clientX - r.left) / r.width * GRID_W);
-      const y = Math.floor((1 - (e.clientY - r.top) / r.height) * GRID_H);
+      const y = Math.floor((e.clientY - r.top) / r.height * GRID_H);
       return { x, y };
     };
     const onDown = (e: MouseEvent) => {
@@ -233,7 +233,7 @@ export const FallingSandPage: React.FC = () => {
       const touch = e.touches[0];
       const r = canvas.getBoundingClientRect();
       const x = Math.floor((touch.clientX - r.left) / r.width * GRID_W);
-      const y = Math.floor((1 - (touch.clientY - r.top) / r.height) * GRID_H);
+      const y = Math.floor((touch.clientY - r.top) / r.height * GRID_H);
       drawingRef.current = true;
       lastDrawRef.current = { x, y };
       drawAt(x, y);
@@ -244,7 +244,7 @@ export const FallingSandPage: React.FC = () => {
       const touch = e.touches[0];
       const r = canvas.getBoundingClientRect();
       const x = Math.floor((touch.clientX - r.left) / r.width * GRID_W);
-      const y = Math.floor((1 - (touch.clientY - r.top) / r.height) * GRID_H);
+      const y = Math.floor((touch.clientY - r.top) / r.height * GRID_H);
       const lx = lastDrawRef.current.x, ly = lastDrawRef.current.y;
       const steps = Math.max(Math.abs(x - lx), Math.abs(y - ly));
       for (let i = 0; i <= steps; i++) {
