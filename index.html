@@ -2,7 +2,7 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/playground/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GPU Playground — WebGPU 시뮬레이션 & 벤치마크</title>
     <meta name="description" content="WebGPU 기반 초고성능 GPU 시뮬레이션 & 벤치마크 플랫폼. 파티클, 프랙탈, 보이드, 레이마칭 등 7가지 실시간 GPU 시뮬레이션." />
@@ -12,30 +12,17 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="GPU Playground — WebGPU Benchmark & Simulations" />
     <meta property="og:description" content="500K+ 파티클 물리, 프랙탈 탐험, Ray Marching 3D 등 7가지 GPU 시뮬레이션. 내 GPU 성능을 테스트하고 점수를 공유하세요." />
-    <meta property="og:image" content="/playground/og-image.png" />
-    <meta property="og:url" content="https://uulab-official.github.io/playground/" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:url" content="https://playground.uulab.co.kr/" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="GPU Playground" />
     <meta name="twitter:description" content="WebGPU 기반 GPU 벤치마크 & 시뮬레이션 플랫폼" />
-    <meta name="twitter:image" content="/playground/og-image.png" />
+    <meta name="twitter:image" content="/og-image.png" />
   </head>
   <body>
     <div id="root"></div>
-    <!-- SPA redirect handler for GitHub Pages 404 -->
-    <script>
-      (function(l) {
-        if (l.search[1] === '/') {
-          var decoded = l.search.slice(1).split('&').map(function(s) {
-            return s.replace(/~and~/g, '&');
-          }).join('?');
-          window.history.replaceState(null, null,
-            l.pathname.slice(0, -1) + decoded + l.hash
-          );
-        }
-      }(window.location));
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
