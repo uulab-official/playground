@@ -10,6 +10,10 @@ import { BoidsPage } from './pages/BoidsPage';
 import { ReactionDiffusionPage } from './pages/ReactionDiffusionPage';
 import { RayMarchPage } from './pages/RayMarchPage';
 import { FallingSandPage } from './pages/FallingSandPage';
+import { AudioVisualizerPage } from './pages/AudioVisualizerPage';
+import { GalaxyPage } from './pages/GalaxyPage';
+import { WaveEquationPage } from './pages/WaveEquationPage';
+import { FluidSimPage } from './pages/FluidSimPage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import './index.css';
@@ -28,6 +32,10 @@ function App() {
         <Route path="/reaction" element={<ReactionDiffusionPage />} />
         <Route path="/raymarch" element={<RayMarchPage />} />
         <Route path="/sand" element={<FallingSandPage />} />
+        <Route path="/audio" element={<AudioVisualizerPage />} />
+        <Route path="/galaxy" element={<GalaxyPage />} />
+        <Route path="/wave" element={<WaveEquationPage />} />
+        <Route path="/fluid" element={<FluidSimPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
