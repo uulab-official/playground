@@ -248,13 +248,14 @@ export const AudioVisualizerPage: React.FC = () => {
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
 
-    // Compute bind group layout
+    // Compute bind group layout — must match audio_compute.wgsl bindings:
+    // @binding(0) uniform, @binding(1) fftData (read), @binding(2) particlesIn (read), @binding(3) particlesOut (read_write)
     const computeBGL = device.createBindGroupLayout({
       entries: [
         { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
-        { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
-        { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
-        { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
+        { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } }, // fftData
+        { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } }, // particlesIn
+        { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },            // particlesOut
       ],
     });
 
@@ -262,9 +263,9 @@ export const AudioVisualizerPage: React.FC = () => {
       layout: computeBGL,
       entries: [
         { binding: 0, resource: { buffer: computeUniformBuffer } },
-        { binding: 1, resource: { buffer: particleBuffers[i] } },
-        { binding: 2, resource: { buffer: particleBuffers[1 - i] } },
-        { binding: 3, resource: { buffer: fftBuffer } },
+        { binding: 1, resource: { buffer: fftBuffer } },              // fftData
+        { binding: 2, resource: { buffer: particleBuffers[i] } },     // particlesIn
+        { binding: 3, resource: { buffer: particleBuffers[1 - i] } }, // particlesOut
       ],
     }));
 
