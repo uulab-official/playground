@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0d0f14"/>
+  <g filter="url(#glow)">
+    <circle cx="32" cy="28" r="4" fill="#a855f7" opacity="0.9"/>
+    <circle cx="22" cy="38" r="3" fill="#6366f1" opacity="0.8"/>
+    <circle cx="42" cy="36" r="3.5" fill="#3b82f6" opacity="0.85"/>
+    <circle cx="28" cy="44" r="2.5" fill="#818cf8" opacity="0.7"/>
+    <circle cx="38" cy="22" r="2" fill="#c084fc" opacity="0.75"/>
+    <circle cx="18" cy="26" r="1.8" fill="#60a5fa" opacity="0.6"/>
+    <circle cx="46" cy="44" r="2" fill="#a78bfa" opacity="0.65"/>
+    <circle cx="32" cy="50" r="1.5" fill="#93c5fd" opacity="0.5"/>
+    <circle cx="14" cy="42" r="1.2" fill="#818cf8" opacity="0.4"/>
+    <circle cx="50" cy="26" r="1.5" fill="#c084fc" opacity="0.5"/>
+  </g>
+  <text x="32" y="58" text-anchor="middle" font-family="system-ui" font-weight="800" font-size="10" fill="url(#g)">GPU</text>
+</svg>
