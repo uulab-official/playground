@@ -420,8 +420,8 @@ export const FluidSimPage: React.FC = () => {
       const m = mouseRef.current;
       const pos = getMousePos(e.clientX, e.clientY);
       if (m.active) {
-        m.dx = (pos.x - m.prevX) * GRID_W;
-        m.dy = (pos.y - m.prevY) * GRID_H;
+        m.dx = (pos.x - m.x) * GRID_W;
+        m.dy = (pos.y - m.y) * GRID_H;
       }
       m.prevX = m.x;
       m.prevY = m.y;
@@ -454,8 +454,8 @@ export const FluidSimPage: React.FC = () => {
       const t = e.touches[0];
       const m = mouseRef.current;
       const pos = getMousePos(t.clientX, t.clientY);
-      m.dx = (pos.x - m.prevX) * GRID_W;
-      m.dy = (pos.y - m.prevY) * GRID_H;
+      m.dx = (pos.x - m.x) * GRID_W;
+      m.dy = (pos.y - m.y) * GRID_H;
       m.prevX = m.x;
       m.prevY = m.y;
       m.x = pos.x;
