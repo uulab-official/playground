@@ -17,7 +17,6 @@ interface SimMode {
   isNew: boolean;
   category: Category;
   tags: string[];
-  featured?: boolean;
 }
 
 const CATEGORIES: { id: FilterTab; label: string; icon: string }[] = [
@@ -63,7 +62,6 @@ const SIM_MODES: SimMode[] = [
     icon: '🧬', gradient: 'linear-gradient(135deg, #f43f5e, #f97316)',
     ready: true, isNew: true, category: 'particles',
     tags: ['10K particles', 'force matrix', 'O(N²)'],
-    featured: true,
   },
   {
     id: 'nbody', title: 'N-Body Gravity', path: '/nbody',
@@ -71,7 +69,6 @@ const SIM_MODES: SimMode[] = [
     icon: '⭐', gradient: 'linear-gradient(135deg, #1e1b4b, #4f46e5)',
     ready: true, isNew: true, category: 'particles',
     tags: ['4096 bodies', 'O(N²)', 'shared memory'],
-    featured: true,
   },
   {
     id: 'life', title: 'Game of Life', path: '/life',
@@ -107,7 +104,6 @@ const SIM_MODES: SimMode[] = [
     icon: '🍄', gradient: 'linear-gradient(135deg, #4ade80, #16a34a)',
     ready: true, isNew: true, category: 'cellular',
     tags: ['200K agents', 'atomic trail'],
-    featured: true,
   },
   {
     id: 'lenia', title: 'Lenia', path: '/lenia',
@@ -115,7 +111,6 @@ const SIM_MODES: SimMode[] = [
     icon: '🧬', gradient: 'linear-gradient(135deg, #065f46, #34d399)',
     ready: true, isNew: true, category: 'cellular',
     tags: ['256×256', 'kernel convolution'],
-    featured: true,
   },
   {
     id: 'fluid', title: 'Fluid Sim', path: '/fluid',
@@ -249,9 +244,6 @@ export const LandingPage: React.FC = () => {
     });
   }, [activeCategory, searchQuery]);
 
-  const featuredSims = filteredSims.filter(m => m.featured);
-  const regularSims = filteredSims.filter(m => !m.featured);
-
   return (
     <div className="landing-page">
       <canvas ref={canvasRef} className="landing-bg" />
@@ -319,38 +311,10 @@ export const LandingPage: React.FC = () => {
             </div>
           )}
 
-          {/* Featured cards */}
-          {featuredSims.length > 0 && (
-            <div className="featured-grid">
-              {featuredSims.map(m => (
-                <button
-                  key={m.id}
-                  className={`mode-card featured-card ${!ok ? '' : ''}`}
-                  onClick={() => ok && navigate(m.path)}
-                  disabled={!ok}
-                  style={{ '--card-gradient': m.gradient } as React.CSSProperties}
-                >
-                  <div className="mode-icon" style={{ background: m.gradient }}>{m.icon}</div>
-                  <div className="mode-info">
-                    <h3>
-                      {m.title}
-                      {m.isNew && <span className="new-badge">NEW</span>}
-                    </h3>
-                    <p>{m.desc}</p>
-                    <div className="sim-tags">
-                      {m.tags.map(tag => <span key={tag} className="sim-tag">{tag}</span>)}
-                    </div>
-                  </div>
-                  <div className="featured-arrow">→</div>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Regular grid */}
-          {regularSims.length > 0 && (
+          {/* Sim grid — uniform, all same size */}
+          {filteredSims.length > 0 && (
             <div className="mode-grid">
-              {regularSims.map(m => (
+              {filteredSims.map(m => (
                 <button
                   key={m.id}
                   className="mode-card"
