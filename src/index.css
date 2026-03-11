@@ -71,8 +71,12 @@ body {
 .landing-page {
   min-height: 100dvh;
   background: #08090c;
-  position: relative;
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.08) transparent;
 }
 
 @keyframes fadeInUp {
