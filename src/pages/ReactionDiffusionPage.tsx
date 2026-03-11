@@ -209,17 +209,24 @@ export const ReactionDiffusionPage: React.FC = () => {
     const resize = () => { canvas.width = canvas.clientWidth * dpr; canvas.height = canvas.clientHeight * dpr; };
     const ro = new ResizeObserver(resize); ro.observe(canvas); resize();
 
-    const onMove = (e: MouseEvent) => {
+    const setPos = (clientX: number, clientY: number) => {
       const r = canvas.getBoundingClientRect();
-      mouseRef.current.x = (e.clientX - r.left) / r.width;
-      mouseRef.current.y = (e.clientY - r.top) / r.height;
+      mouseRef.current.x = (clientX - r.left) / r.width;
+      mouseRef.current.y = (clientY - r.top) / r.height;
     };
-    const onDown = () => { mouseRef.current.pressed = true; };
+    const onMove = (e: MouseEvent) => setPos(e.clientX, e.clientY);
+    const onDown = (e: MouseEvent) => { mouseRef.current.pressed = true; setPos(e.clientX, e.clientY); };
     const onUp = () => { mouseRef.current.pressed = false; };
+    const onTouchStart = (e: TouchEvent) => { e.preventDefault(); mouseRef.current.pressed = true; setPos(e.touches[0].clientX, e.touches[0].clientY); };
+    const onTouchMove = (e: TouchEvent) => { e.preventDefault(); setPos(e.touches[0].clientX, e.touches[0].clientY); };
+    const onTouchEnd = () => { mouseRef.current.pressed = false; };
 
     canvas.addEventListener('mousemove', onMove);
     canvas.addEventListener('mousedown', onDown);
     window.addEventListener('mouseup', onUp);
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd);
 
     fpsTime.current = performance.now();
     initGPU().then(() => { rafRef.current = requestAnimationFrame(render); });
@@ -230,6 +237,9 @@ export const ReactionDiffusionPage: React.FC = () => {
       canvas.removeEventListener('mousemove', onMove);
       canvas.removeEventListener('mousedown', onDown);
       window.removeEventListener('mouseup', onUp);
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
       if (gpuRef.current) {
         gpuRef.current.gridBuffers.forEach(b => b.destroy());
         gpuRef.current.computeUniformBuffer.destroy();
