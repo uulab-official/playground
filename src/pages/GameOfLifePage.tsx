@@ -220,14 +220,14 @@ export const GameOfLifePage: React.FC = () => {
     rafRef.current = requestAnimationFrame(render);
   }, []);
 
-  // Mouse drawing
-  const drawCell = useCallback((e: MouseEvent) => {
+  // Mouse/touch drawing
+  const drawCellAt = useCallback((clientX: number, clientY: number) => {
     const gpu = gpuRef.current;
     const canvas = canvasRef.current;
     if (!gpu || !canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / rect.width * GRID_W);
-    const y = Math.floor((e.clientY - rect.top) / rect.height * GRID_H);
+    const x = Math.floor((clientX - rect.left) / rect.width * GRID_W);
+    const y = Math.floor((clientY - rect.top) / rect.height * GRID_H);
     if (x < 0 || x >= GRID_W || y < 0 || y >= GRID_H) return;
     const idx = y * GRID_W + x;
     const data = new Uint32Array([1]);
@@ -245,13 +245,19 @@ export const GameOfLifePage: React.FC = () => {
     ro.observe(canvas);
     resize();
 
-    const onDown = (e: MouseEvent) => { drawingRef.current = true; drawCell(e); };
-    const onMove = (e: MouseEvent) => { if (drawingRef.current) drawCell(e); };
+    const onDown = (e: MouseEvent) => { drawingRef.current = true; drawCellAt(e.clientX, e.clientY); };
+    const onMove = (e: MouseEvent) => { if (drawingRef.current) drawCellAt(e.clientX, e.clientY); };
     const onUp = () => { drawingRef.current = false; };
+    const onTouchStart = (e: TouchEvent) => { e.preventDefault(); drawingRef.current = true; drawCellAt(e.touches[0].clientX, e.touches[0].clientY); };
+    const onTouchMove = (e: TouchEvent) => { e.preventDefault(); if (drawingRef.current) drawCellAt(e.touches[0].clientX, e.touches[0].clientY); };
+    const onTouchEnd = () => { drawingRef.current = false; };
 
     canvas.addEventListener('mousedown', onDown);
     canvas.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd);
 
     fpsTime.current = performance.now();
     initGPU().then(() => { rafRef.current = requestAnimationFrame(render); });
@@ -263,6 +269,9 @@ export const GameOfLifePage: React.FC = () => {
       canvas.removeEventListener('mousedown', onDown);
       canvas.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
       if (gpuRef.current) {
         gpuRef.current.cellBuffers.forEach(b => b.destroy());
         gpuRef.current.computeUniformBuffer.destroy();
